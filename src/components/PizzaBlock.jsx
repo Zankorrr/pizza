@@ -1,4 +1,13 @@
-export default function PizzaBlock(props) {
+import { useState } from "react";
+
+export default function PizzaBlock({title, price}) {
+
+  const [pizzaCount, setPizzaCount] = useState(0)
+
+  const onClickAdd = () => {
+    setPizzaCount(pizzaCount + 1)
+  }
+
   return (
     <div className="pizza-block">
       <img
@@ -6,7 +15,7 @@ export default function PizzaBlock(props) {
         src="https://dodopizza-a.akamaihd.net/static/Img/Products/Pizza/ru-RU/b750f576-4a83-48e6-a283-5a8efb68c35d.jpg"
         alt="Pizza"
       />
-      <h4 className="pizza-block__title">{props.title}</h4>
+      <h4 className="pizza-block__title">{title}</h4>
       <div className="pizza-block__selector">
         <ul>
           <li className="active">thin</li>
@@ -19,8 +28,8 @@ export default function PizzaBlock(props) {
         </ul>
       </div>
       <div className="pizza-block__bottom">
-        <div className="pizza-block__price">from ${props.price}</div>
-        <div className="button button--outline button--add">
+        <div className="pizza-block__price">from ${price}</div>
+        <button className="button button--outline button--add" onClick={onClickAdd}>
           <svg
             width="12"
             height="12"
@@ -34,8 +43,8 @@ export default function PizzaBlock(props) {
             />
           </svg>
           <span>Add</span>
-          <i>2</i>
-        </div>
+          <i>{pizzaCount}</i>
+        </button>
       </div>
     </div>
   );
