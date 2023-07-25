@@ -1,12 +1,14 @@
+import mainLogo from "../assets/img/pizza-logo.svg"
+
 export default function Header() {
   return (
     <div className="header">
       <div className="container">
         <div className="header__logo">
-          <img width="38" src="../img/pizza-logo.svg" alt="Pizza logo" />
+          <img width="38" src={mainLogo} alt="Pizza logo" />
           <div>
             <h1>React Pizza</h1>
-            <p>best pizza in the universe!</p>
+            <p>best pizza in the universe</p>
           </div>
         </div>
         <div className="header__cart">
