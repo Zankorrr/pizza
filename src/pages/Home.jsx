@@ -15,6 +15,7 @@ const Home = () => {
         setItems(data)
         setIsLoading(false)
       })
+      window.scrollTo(0, 0)
     }, [])
     return (
     <div className="content">
