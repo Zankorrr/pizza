@@ -4,12 +4,14 @@ import Sort from "../components/Sort";
 import PizzaBlock from "../components/PizzaBlock";
 import Skeleton from "../components/PizzaBlock/Skeleton";
 import { SearchContext } from "../App";
+import { useSelector } from "react-redux"
 
 const Home = () => {
+  const categoryId = useSelector((state) => state.filter.categoryId)
+  const sortTypeId = useSelector((state) => state.filter.sortTypeId)
+
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [categoryId, setCategoryId] = useState(0);
-  const [sortType, setSortType] = useState(0);
 
   const { searchValue } = useContext(SearchContext)
 
@@ -19,7 +21,7 @@ const Home = () => {
     fetch(
       `https://64bfd7fd0d8e251fd1118c90.mockapi.io/items?${
         categoryId ? `category=${categoryId}` : ""
-      }&sortBy=${sortNames[sortType]}&order=asc`
+      }&sortBy=${sortNames[sortTypeId]}&order=asc`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -27,14 +29,14 @@ const Home = () => {
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
-  }, [categoryId, sortType]);
+  }, [categoryId, sortTypeId]);
 
   return (
     <div className="content">
       <div className="container">
         <div className="content__top">
-          <Categories value={categoryId} toggle={(id) => setCategoryId(id)} />
-          <Sort value={sortType} toggle={(id) => setSortType(id)} />
+          <Categories />
+          <Sort />
         </div>
         <h2 className="content__title">All Pizzas</h2>
         <div className="content__items">

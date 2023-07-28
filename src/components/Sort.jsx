@@ -1,13 +1,18 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSortTypeId } from "../redux/filterSlice";
 
-export default function Sort({value, toggle}) {
+export default function Sort() {
   const [open, setOpen] = useState(false);
+
+  const dispatch = useDispatch()
+  const sortTypeId = useSelector((state) => state.filter.sortTypeId)
 
   const sortNames = ["rating", "price", "title"];
 
   const sortChange = (index) => {
     setOpen(false);
-    toggle(index);
+    dispatch(setSortTypeId(index))
   };
 
   return (
@@ -26,18 +31,18 @@ export default function Sort({value, toggle}) {
           />
         </svg>
         <b>Sort by:</b>
-        <span onClick={() => setOpen(!open)}>{sortNames[value]}</span>
+        <span onClick={() => setOpen(!open)}>{sortNames[sortTypeId]}</span>
       </div>
       {open && (
         <div className="sort__popup">
           <ul>
-            {sortNames.map((value, index) => (
+            {sortNames.map((sortTypeId, index) => (
               <li
-                key={value + index}
+                key={sortTypeId + index}
                 onClick={() => sortChange(index)}
-                className={value === index ? "active" : ""}
+                className={sortTypeId === index ? "active" : ""}
               >
-                {value}
+                {sortTypeId}
               </li>
             ))}
           </ul>
