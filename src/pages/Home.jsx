@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import axios from "axios"
 import Categories from "../components/Categories";
 import Sort from "../components/Sort";
 import PizzaBlock from "../components/PizzaBlock";
@@ -7,8 +8,7 @@ import { SearchContext } from "../App";
 import { useSelector } from "react-redux"
 
 const Home = () => {
-  const categoryId = useSelector((state) => state.filter.categoryId)
-  const sortTypeId = useSelector((state) => state.filter.sortTypeId)
+  const { categoryId, sortTypeId } = useSelector((state) => state.filter)
 
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,16 +18,13 @@ const Home = () => {
   useEffect(() => {
     const sortNames = ["rating", "price", "title"];
     setIsLoading(true);
-    fetch(
-      `https://64bfd7fd0d8e251fd1118c90.mockapi.io/items?${
-        categoryId ? `category=${categoryId}` : ""
-      }&sortBy=${sortNames[sortTypeId]}&order=asc`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data);
+    axios.get(`https://64bfd7fd0d8e251fd1118c90.mockapi.io/items?${
+      categoryId ? `category=${categoryId}` : ""
+    }&sortBy=${sortNames[sortTypeId]}&order=asc`)
+      .then((res => {
+        setItems(res.data);
         setIsLoading(false);
-      });
+      }))
     window.scrollTo(0, 0);
   }, [categoryId, sortTypeId]);
 
