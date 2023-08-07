@@ -1,32 +1,70 @@
-import { useContext, useEffect, useState } from "react";
-import axios from "axios"
+import { useContext, useEffect, useRef, useState } from "react";
+import axios from "axios";
 import Categories from "../components/Categories";
 import Sort from "../components/Sort";
 import PizzaBlock from "../components/PizzaBlock";
 import Skeleton from "../components/PizzaBlock/Skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import qs from "qs";
+import { useNavigate } from "react-router-dom";
+import { setFilters } from "../redux/filterSlice";
 import { SearchContext } from "../App";
-import { useSelector } from "react-redux"
 
 const Home = () => {
-  const { categoryId, sortTypeId } = useSelector((state) => state.filter)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const isSearch = useRef(false)
+  const isMounted = useRef(false)
 
-  const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const { categoryId, sortTypeId } = useSelector((state) => state.filter);
   const { searchValue } = useContext(SearchContext)
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
+  const sortNames = ["rating", "price", "title"]
+  const sortProperty = sortNames[sortTypeId]
 
   useEffect(() => {
-    const sortNames = ["rating", "price", "title"];
+    if(isMounted.current) {
+    const queryString = qs.stringify({
+      category: categoryId,
+      sortBy: sortProperty,
+    })
+    navigate(`?${queryString}`)
+  }
+  isMounted.current = true
+  }, [categoryId, navigate, sortProperty])
+
+  useEffect(() => {
+    if(window.location.search) {
+      const params = qs.parse(window.location.search.substring(1))
+      const sortTypeId = sortNames.indexOf(params.sortBy)
+
+      dispatch(setFilters({
+        ...params,
+        sortTypeId
+      }))
+      isSearch.current = true
+    }
+  }, [])
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if(!isSearch.current) {
+      const category = categoryId > 0 ? `category=${categoryId}` : ''
+    const sort = sortTypeId > 0 ? `&sortBy=${sortProperty}&order=asc` : ''
+    const search = searchValue ? `&search=${searchValue}` : ''
     setIsLoading(true);
-    axios.get(`https://64bfd7fd0d8e251fd1118c90.mockapi.io/items?${
-      categoryId ? `category=${categoryId}` : ""
-    }&sortBy=${sortNames[sortTypeId]}&order=asc`)
-      .then((res => {
+    axios
+      .get(
+        `https://64bfd7fd0d8e251fd1118c90.mockapi.io/items?${category}${sort}${search}`
+      )
+      .then((res) => {
         setItems(res.data);
         setIsLoading(false);
-      }))
-    window.scrollTo(0, 0);
-  }, [categoryId, sortTypeId]);
+      });
+    }
+    isSearch.current = false
+  }, [categoryId, searchValue, sortProperty, sortTypeId])
 
   return (
     <div className="content">
@@ -40,14 +78,14 @@ const Home = () => {
           {isLoading
             ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
             : items
-                .filter((obj) => {
-                  return obj.title
-                    .toLowerCase()
-                    .includes(searchValue.toLowerCase());
-                })
-                .map((obj, index) => (
-                  <PizzaBlock key={obj.title + index} {...obj} />
-                ))}
+            .filter((obj) => {
+              return obj.title
+                .toLowerCase()
+                .includes(searchValue.toLowerCase());
+            })
+            .map((obj, index) => (
+                <PizzaBlock key={obj.title + index} {...obj} />
+              ))}
         </div>
       </div>
     </div>
